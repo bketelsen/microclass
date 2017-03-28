@@ -21,10 +21,14 @@ func main() {
 	example.RegisterExampleHandler(service.Server(), new(handler.Example))
 
 	// Register Struct as Subscriber
-	example.RegisterSubscriber("topic.com.brianketelsen.srv.demo", service.Server(), new(subscriber.Example))
+	service.Server().Subscribe(
+		service.Server().NewSubscriber("topic.com.brianketelsen.srv.demo", new(subscriber.Example)),
+	)
 
 	// Register Function as Subscriber
-	example.RegisterSubscriber("topic.com.brianketelsen.srv.demo", service.Server(), subscriber.Handler)
+	service.Server().Subscribe(
+		service.Server().NewSubscriber("topic.com.brianketelsen.srv.demo", subscriber.Handler),
+	)
 
 	// Initialise service
 	service.Init()
