@@ -1,5 +1,10 @@
 .idea/
 .DS_Store
 ./microclass
+module1/gomicro/greeter/web/web
 
-
+module1/goa/gopherjs/gopherjs
+module1/goa/gopherjs/public/website.js
+module1/goa/gopherjs/public/website.js.map
+module1/goa/gopherjs/tool/
+module1/goa/gopherjs/images/
