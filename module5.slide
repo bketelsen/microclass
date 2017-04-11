@@ -1,0 +1,84 @@
+Consuming The Authentication Microservice
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Consuming Our Microservice
+
+In this module we will demonstrate the process of consuming a micro service from the micro cli, from the micro web interface, and finally from another application.
+
+* Consuming from the Micro CLI
+
+Remembering back to our introduction, there is a simple way using the micro cli to list services, get information about services, and even query them.  Let's test our authentication service using the cli.
+
+* CLI
+
+First, start by listing the service:
+
+    micro list services
+
+Then use the `get` subcommand:
+
+    micro get service go.micro.srv.user
+
+The `get` subcommand gives you a list of the endpoints and the messages needed to query them.
+
+* CLI Query
+
+To create a new account, query the `Account.Create` endpoint, passing in a json-formatted message with the CreateRequest body:
+
+    micro query go.micro.srv.user Account.Create '{"user":{"id":
+        "ff3c06de-9e43-41c7-9bab-578f6b4ad32b",
+        "username": "gopher", "email": "gopher@example.com"}, "password": "password1"}'
+
+* CLI Exercise
+
+- Create a new user
+- Create a new session for that user (Account.Login)
+- Update the user's password
+- Logout the user
+
+
+* Consuming from the Micro Web Interface (Exercise)
+
+To start the micro web interface type `micro web` at a command prompt:
+
+    micro web
+
+Open your browser to http://127.0.0.1:8082
+
+- Navigate to the `Registry` link at the top and inspect your service.
+- Navigate to the `Query` link at the top and call your service using the information you gained inspecting it.
+
+* Consuming from Another Application
+
+Now let's shift into more practical usage of the micro toolkit and show how to call your service from another application.
+
+`micro` offers two distinct ways to consumer your service.  The first is a generic micro client that you can use to make a call to any service.  Let's build a command-line application that requires authentication before it will run.
+
+    Be sure that you've created a new user in the previous step before trying this step!
+
+* Generic Client
+
+The `micro` package includes a `NewRequest` method that creates a request for any service.  You must know the service name and the method to call, and pass in a pointer to the request type of the service.
+
+    req := client.NewRequest("go.micro.srv.user", "Account.Login", &account.LoginRequest{...})
+
+* Generic Client
+
+To make the request, create a pointer to the response type and pass it into the `client.Call()` function:
+
+    rsp := &account.LoginResponse{}
+    err := client.Call(ctx, req, rsp)
+
+* Consuming from Another Application
+
+Micro also generates a strongly typed client for you when you run the protocol buffer generators.
+
+    cl := account.NewAccountClient("go.micro.srv.user",client.DefaultClient)
+    req := &account.LoginRequest{Username: "gopher", Password:"password1"}
+    rsp, err := cl.Login(ctx,req)
+
+Unlike the generic client, the strongly typed client has functions for each type of request.
+

@@ -34,7 +34,7 @@ test:
 	$(GOTEST) -v ./db -race
 	$(GOTEST) -v ./handler -race
 
-db-up:  db-down
+db-up:  
 	$(DOCKER) run -d --name=$(MYSQLDB) -p 3306:3306 -e MYSQL_ROOT_PASSWORD=s3cretStuff -e MYSQL_DATABASE=users mysql:5.7
 
 db-down: 
@@ -45,6 +45,5 @@ setup-dev: deps db-up
 
 teardown-dev: clean db-down
 
-run: setup-dev
-	sleep 10
+run: 
 	$(GOCMD) run main.go --database_url="root:s3cretStuff@tcp(127.0.0.1:3306)/users"

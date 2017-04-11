@@ -1,0 +1,192 @@
+Authentication Microservice
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Authentication
+
+In this module we will walk through the process of defining and building a micro based service for authentication.
+
+* Problem Definition
+
+We have a requirement to build a microservice that authenticates users.  Upon successful authentication, the user will be granted a session token.  Session tokens will expire after a preconfigured amount of time.
+
+Systems that wish to validate a session should be able to call an endpoint on the service to validate that the session is active.
+
+* Service Definition
+
+Our service will represent the following types:
+
+- User
+- Session
+
+* Service Definition
+
+Our service will have the following endpoints:
+
+- Login
+- Logout
+- ReadSession
+- Search
+- UpdateUser
+- UpdatePassword
+- Create (User)
+- Delete (User)
+- Update (User)
+
+* Step 1
+
+The first step is to generate a new service using the `micro new` command:
+
+    micro new github.com/bketelsen/microclass/module4/generate
+
+This creates a new `micro` service called `generate` in the `module4` parent directory.  This service is a shell,
+ready for us to change to meet our business requirements.
+
+These steps are distinct in the source code repository for this class.  Each step (1generate, 2proto, etc) will not compile, don't be alarmed!
+We're showing a service creation in steps.
+
+
+* Step 2
+
+Next, we'll delete the protocol buffer definition for the `example` service, and create a new folder called `account`.
+
+In the `account` folder (under the `proto` subdirectory) we'll create a proto file called `account`.
+
+* Step 3
+
+In our `account.proto` file, we need to define the Service and the messages that the methods of the Service will use.
+
+Let's start by creating the base types our service will use.
+
+
+* Step 3
+
+We know our most important type is a `User` so let's create that first.
+
+
+    message User {
+        string id = 1;		    // uuid
+        string username = 2;	// alphanumeric account (user,machine,org)
+        string email = 3;
+        int64 created = 4;	    // unix
+        int64 updated = 5;	    // unix
+    }
+
+* Step 3
+
+We also need to create a Session type, that will be stored as a record of a successful login, and returned to the consumer.
+
+
+    message Session {
+        string id = 1;          // session key/token
+        string username = 2;
+        int64 created = 3;      // unix
+        int64 expires = 4;      // unix
+    }
+
+* Step 3
+
+Now let's define the methods that our service will offer:
+
+    service Account {
+        rpc Create(CreateRequest) returns (CreateResponse) {}
+        rpc Read(ReadRequest) returns (ReadResponse) {}
+        rpc Update(UpdateRequest) returns (UpdateResponse) {}
+        rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+        rpc Search(SearchRequest) returns (SearchResponse) {}
+        rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+        rpc Login(LoginRequest) returns (LoginResponse) {}
+        rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+        rpc ReadSession(ReadSessionRequest) returns(ReadSessionResponse) {}
+    }
+
+We used our requirements to determine the methods we'll need.
+
+* Step 3
+
+Now let's create the message types required for our methods.  We defined several methods like `Create`, and each requires a
+Request and Response type:
+
+    message CreateRequest {
+        User user = 1;
+    }
+
+    message CreateResponse {
+    }
+
+Note: Error conditions are passed in the RPC function, so it's not necessary to include error fields in the Response types.
+
+* Step 4 Service Generation
+
+Now that the service is defined, we can update our `main` to create a new instance of the correct service.
+This is a good time to run our protocol buffer generation first, so we have Go code representing the proto service:
+
+    protoc -I/home/bketelsen/src --go_out=plugins=micro:/home/bketelsen/src \
+        /home/bketelsen/src/github.com/bketelsen/microclass/module4/4main/proto/account/account.proto
+
+Running the protoc compiler generates the Go code that matches the protocol buffer definition in `account.proto`.  Take a moment and inspect the generated file `account.pb.go`.
+
+* Step 4
+
+In order to update the `main` function to register the correct service, handler, & subscribers, we need to fix the handler and subscriber code.
+
+Let's delete `handler/example.go` and add `handler/account.go`.
+
+In `main4/proto/handler/account.go`, a full implementation of this service handler exists.  Note that it does not yet include a database package, but references one.  We'll add that shortly!
+
+* Step 4
+
+Our code doesn't need to subscribe to events related to the messages that are sent and received.  Let's delete the `subscriber` package, and remove subscription code from `main.go`.
+
+* Step 5
+
+Our service is looking good.  The final step is to create a `db` package that stores our user and session information.  The code in `5db` includes such a package.
+
+* Final Steps
+
+The last thing we need is some glue code, and helper scripts to get everything running.  Makefiles are perfect for this, so we'll add a makefile to our final version of this project.
+
+First we need to tell our app where to find the database.  Modify `main.go` to register a command line flag, then apply that command line variable to the db package:
+
+    service := micro.NewService(
+        micro.Name("go.micro.srv.user"),
+        micro.Flags(
+            cli.StringFlag{
+                Name:   "database_url",
+                EnvVar: "DATABASE_URL",
+                Usage:  "The database URL e.g root@tcp(127.0.0.1:3306)/user",
+            },
+        ),
+
+        micro.Action(func(c *cli.Context) {
+            if len(c.String("database_url")) > 0 {
+                db.Url = c.String("database_url")
+            }
+        }),
+    )
+
+* Final Steps
+
+Now let's add a Makefile to the root of the project with some common commands and sequences that we'll need.  See an example in `module4/userservice/Makefile`.
+
+With a few nice helper commands in our Makefile, we can start consul, and start our app:
+
+    make consul &
+    make run
+
+
+* Exercise
+
+- Build and run the `module4/userservice` microservice.
+- Create a new user.
+
+   $ micro query go.micro.srv.user Account.Create '{"user":{"id":
+        "ff3c06de-9e43-41c7-9bab-578f6b4ad32b",
+        "username": "gopher", "email": "gopher@example.com"}, "password": "password1"}'
+
+- Login the new user.
+
+    micro query go.micro.srv.user Account.Login '{"username": "gopher", "password": "password1"}'
+

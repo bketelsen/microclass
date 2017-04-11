@@ -1,0 +1,9 @@
+Distributed Service Monitoring, Tracing, Debugging
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Monitoring, Tracing, Debugging
+
+In this module we will demonstrate the protocols and tools needed to debug, trace and monitor a suite of microservices.

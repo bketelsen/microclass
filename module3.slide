@@ -1,0 +1,103 @@
+Go Micro Ecosystem
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Demonstration of Go Micro Tools
+
+In this module I will list the components involved in a typical microservices platform and discuss the options available in a Micro deployment,
+presenting the defaults and replacement options for each component.  Micro abstracts the details from you, so your code doesn't change when you change the components.
+
+Your servers and clients don't know or care about the underlying transport, codec, queue, etc.
+
+
+* Message Queue
+
+Most microservices deployments have a message queue.  Micro uses http based messaging by default.  This is convenient for development, but sub-optimal for production usage.
+
+Better options:  [https://github.com/micro/go-plugins/tree/master/broker]
+
+- Google PubSub
+- Kafka
+- MQTT
+- NATS
+- NSQ
+- RabbitMQ
+- Redis
+
+
+* Message Codec
+
+Micro uses `protorpc` as the default codec.  It is suitable for production usage.  You may have a requirement to use other codecs.
+
+- bsonrpc
+- jsonrpc
+- jsonrpc2
+- mercury
+- messagepackrpc
+
+[github.com/micro/go-plugins/tree/master/codec]
+
+* Registry
+
+Micro uses consul as the default registry/service discovery mechanism.  Others are available:
+
+- etcd
+- etcdv3
+- eureka
+- gossip **
+- kubernetes
+- mdns **
+- memory **
+- nats
+- zookeeper
+
+`**` = don't use these in production
+
+* Selector
+
+The selector is the client-side mechanism for choosing a service to call.  The default is `cache`.
+
+- blacklist - filters nodes that have errored
+- label - gives more exact label matches higher priority
+- cache - random hashed balances across cached list of available services, watches registry
+- named - useful when the transport layer is a queue like Kafka/NSQ/RabbitMQ
+
+
+* Server
+
+The server plugins allow you to change the service implementation.  Available alternatives:
+
+- http - build your own http server
+- grpc - use GRPC services
+
+* Transport
+
+Micro defaults to use http transport.  Other options:
+
+- grpc
+- nats
+- rabbitmq
+- tcp
+- utp (uTP is the Micro Transport Protocol an open UDP variant of the BitTorrent protocol)
+
+* Wrapper
+
+Micro provides some wrappers which are similar in functionality to middleware.
+
+- breaker - a circuit breaker
+- ratelimiter
+- trace
+
+
+* ProTip
+
+Plugins are registered with import statements.  Add an extra file to your package, and guard it with build tags.
+
+production.go:
+    //+build production
+    package main
+    import _ github.com/micro/go-plugins/brokers/kafka
+
+

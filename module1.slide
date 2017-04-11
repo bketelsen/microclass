@@ -1,0 +1,102 @@
+Microservices Overview
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Overview of Microservices
+
+In this module we will present a definition of microservices and explain some of the problems microservices attempt to solve.
+We will review common vocabulary and lay the groundwork for the rest of the class by defining the problem space.
+
+* Just a Small Service?
+
+Microservices means different things to different people but most will agree with:
+
+- Data store must be independent
+- Design must be independent and target bounded context (DDD)
+- Driven by deployment needs ("Devops")
+- Implementation details should fit in head
+
+* Why?
+
+Helps with scalability
+
+- of system
+- of teams
+
+* Why not?
+
+Distributed systems are hard
+
+- Whole new class of problems
+
+* Practical Approach
+
+Start with "well designed monolith", identify context domains.
+
+- easier to fix design errors
+
+Split into microservices
+
+- as the need arises (e.g. need to scale up a "service" or new team joins project)
+- start with parts that map to well identified domain
+
+* Microservicy Concepts
+
+* Message Queues
+
+Allows components in the architecture to send messages without worrying about the consumers.
+Allows consumers to receive messages (events) without knowing the producers.
+
+* Transport
+
+The mechanism of communication.  HTTP, TCP, UDP, Message Queue, etc.
+
+* Encoding / CODEC
+
+The mechanism of encoding a message so that it is capable of being transported and decoded.
+
+
+* Service discovery
+
+Allows services to discover dependencies dynamically.
+
+- replaces static configuration files
+- e.g. `Consul` (Go), `Zookeeper`, `etcd`, `doozerd`
+
+* Circuit breaker
+
+Software layer that keeps track of failures in remote services.
+
+- maintains "green", "yellow", "red" status for all remote services
+- implements retry strategy, health-checks
+
+* Load balancing
+
+Split traffic between multiple instances of a microservice.
+
+- client side load balancing via service discovery + health checks
+- server side load balancing via nginx, haproxy, etc.
+
+Combine both to enable logical and physical groupings.
+
+* Go Frameworks
+
+* Short List
+
+*go-kit*: collection of independent packages that help solve specific problems
+
+- promotes a clean separation between transport and business model
+
+*Micro*: ecosystem for building microservices
+
+- more opinionated than go-kit, more batteries included
+
+*Gizmo*: packages to put together server and pubsub daemons
+
+- similar to micro, with a pub/sub emphasis, fewer batteries
+
+*goa*: design based approach
+
+- codegen, design sharing helps building "conforming" services

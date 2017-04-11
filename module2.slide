@@ -1,0 +1,171 @@
+Go Micro Demo
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Demonstration of Go Micro Tools
+
+In this module we will demonstrate the Micro platform and show students the tools that we’ll be using in the rest of the course.
+
+* Setup
+
+In order to run any micro services we need a registry.  The default registry is `consul`, which you can install from consul.io, or run using docker.
+
+    consul agent -dev
+
+We'll start consul in a new terminal window in `dev` mode, so it won't expect other nodes to join.
+
+* Micro CLI tool
+
+
+    api		Run the micro API
+    bot		Run the micro bot
+    registry	Query registry
+    query	Query a service method using rpc
+    stream	Query a service method using streaming rpc
+    health	Query the health of a service
+    stats	Query the stats of a service
+    list	List items in registry
+    register	Register an item in the registry
+    deregister	Deregister an item in the registry
+    get		Get item from registry
+    sidecar	Run the micro sidecar
+    new		Create a new Micro service by specifying a directory path relative to your $GOPATH
+    web		Run the micro web app
+
+* Micro CLI Commands
+
+registry -- work with the service discovery registry
+
+    $ micro registry list services
+    consul
+
+`registry` gives you tools to work with the service registry.  You can register, deregister, display, or query using `micro registry`
+
+
+* Micro CLI Commands
+
+get -- retrieve information about a service
+
+    $ micro get service go.micro.srv.greeter
+    service  go.micro.srv.greeter
+
+    version 1.0.0
+
+    Id	Address	Port	Metadata
+    go.micro.srv.greeter-ed7c6e52-1331-11e7-8c5f-5a943f33135a	10.0.1.98	37505
+        ...transport=http,broker=http,server=rpc,registry=consul
+
+    Endpoint: Say.Hello
+    Metadata: stream=false
+
+    Request: {
+        name string
+    }
+
+    Response: {
+        msg string
+    }
+
+
+* Micro CLI Commands
+
+query -- make a request to a service
+
+    bketelsen@arrakis:[~] micro query go.micro.srv.greeter Say.Hello '{"name": "Brian"}'
+    {
+        "msg": "Hello Brian"
+    }
+
+* Micro CLI Commands
+
+stats -- get runtime information about a service
+
+    $ micro stats go.micro.srv.greeter
+    service  go.micro.srv.greeter
+
+    version 1.0.0
+
+    node		                                                    address:port
+    go.micro.srv.greeter-ed7c6e52-1331-11e7-8c5f-5a943f33135a		10.0.1.98:37505
+
+    started	        uptime	memory	threads	gc
+    Mar 27 17:11:21	8m26s	0.46mb	12	    988.256µs
+
+* Micro CLI Commands
+
+list -- list items in the registry
+
+    $ micro list
+    consul
+    go.micro.srv.greeter
+
+* Micro CLI Commands
+
+health -- get health of a service
+
+    $ micro health go.micro.srv.greeter
+    service  go.micro.srv.greeter
+
+    version 1.0.0
+
+    node		                                                    address:port		status
+    go.micro.srv.greeter-ed7c6e52-1331-11e7-8c5f-5a943f33135a		10.0.1.98:37505		ok
+
+* Micro CLI Commands
+
+web -- run the micro web console
+
+    [[Demo]]
+
+* Micro CLI Commands
+
+new -- create a new microservice from a template
+
+    micro new --help
+    NAME:
+        micro new - Create a new Micro service by specifying a directory path relative to your $GOPATH
+
+    USAGE:
+        micro new [command options] [arguments...]
+
+    OPTIONS:
+        --namespace "go.micro"	Namespace for the service e.g com.example
+        --type "srv"			Type of service e.g api, srv, web
+        --fqdn 			        FQDN of service e.g com.example.srv.service (defaults to namespace.type.alias)
+        --alias 			    Alias is the short name used as part of combined name if specified
+
+
+* Micro New
+ micro new {{location under $GOPATH}}
+
+    $ micro new --namespace="com.brianketelsen" --type="srv" \
+            --alias="demo" github.com/bketelsen/microclass/module2/demo
+      creating service com.brianketelsen.srv.demo
+      creating /home/bketelsen/src/github.com/bketelsen/microclass/module2/demo
+      ... SNIP ...
+
+    download protobuf for micro:
+
+    go get github.com/micro/protobuf/{proto,protoc-gen-go}
+
+    compile the proto file example.proto:
+
+    protoc -I/home/bketelsen/src \
+        --go_out=plugins=micro:/home/bketelsen/src \
+        /home/bketelsen/src/github.com/bketelsen/microclass/module2/demo/proto/example/example.proto
+
+* Exercise
+
+    Install consul from consul.io Install micro :
+        go get github.com/micro/micro
+    Start Consul
+    Generate a new service with `micro new`
+    Install the protobuf compilers for micro using the output from `micro new` as your guide
+    Compile the proto file using the output from `micro new` as your guide
+
+Hint:
+    `micro new` expects a location under your $GOPATH
+    Therefore `micro new github.com/me/service`
+    will generate a service located at $GOPATH/src/github.com/me/service

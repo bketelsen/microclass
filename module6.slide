@@ -1,0 +1,53 @@
+Aggregating Services
+
+Brian Ketelsen
+me@brianketelsen.com
+@bketelsen
+
+* Aggregating Services
+
+In this module we will demonstrate how to compose smaller services into a larger one.
+
+* Aggregation
+
+A key component of the microservices ethos is that they can and should serve as remote functions, and should be treated as such.  Often to perform a more complex task you'll need data from more than one source, or you'll need to notify more than one system.  This is where you need to aggregate microservices together.  This module discusses the ways to do this from a client program perspective.
+
+* Dependencies
+
+A microservice should be treated like any other external dependency in your application.  If you typically make an interface to abstract external dependencies, you should do the same for microservice calls.  Fortunately since microservices have generally fewer methods, this is a simple process.  While you're testing your application, with an interface properly mocked you can test your app in isolation and leave your integration tests to catch any edge cases.  A properly created interface should catch nearly all problems.
+
+* Scenario
+ 
+We've already created an authentication service, now let's retrieve user profiles from a profile service.
+
+Part of the Micro `OS` ecosystem is a user profile service called `profile-srv`, let's deploy that and use it to get a user's profile after they authenticate.
+
+* profile-srv
+
+Let's start a profile service.
+
+	go get -t -u github.com/micro/profile-srv
+
+Now start a docker database: 
+
+	docker run -d --name=profile_db -p 3307:3306 -e MYSQL_ROOT_PASSWORD=s3cretStuff -e MYSQL_DATABASE=profile mysql:5.7
+
+Make sure to use a different exposed port for this instance of mysql.
+
+* profile-srv
+
+Now build the profile-srv binary:
+
+	cd github.com/micro/profile/srv && go build 
+
+Run it specifying the database connection url:
+
+	./profile-srv --database_url="root:s3cretStuff@tcp(127.0.0.1:3307)/profile"
+
+Run `micro web` to take a look at the service.
+
+* Aggregation time
+
+Now we have an authentication service and a profile service running.  Create accounts in both with the same ID.
+
+
