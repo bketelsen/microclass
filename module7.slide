@@ -7,3 +7,135 @@ me@brianketelsen.com
 * Monitoring, Tracing, Debugging
 
 In this module we will demonstrate the protocols and tools needed to debug, trace and monitor a suite of microservices.
+
+* The Micro OS
+
+Micro OS is a name for the suite of microservices that are pre-built for you as a base for your system.  They are standard Micro -based services, but pre-built with the needs of a production deployment in mind.
+
+* Micro OS
+
+Micro OS is a set of interface definitions, and implementations of those interfaces.  The implementations are ready to use, but you may choose to implement the interfaces differently in order to meet your business requirements.
+
+* OS: Auth
+
+Auth is a microservice that provides authentication and authorization (Oauth2)
+
+	https://github.com/micro/auth-srv
+
+You've seen auth-srv, in fact you implemented it in Module 4.
+
+* OS: Config
+
+Config is a microservice for providing dynamic configuration.
+
+	https://github.com/micro/config-srv
+
+Config allows you to store configuration values in a namespaced key/value store.  It provides auditing and searching.  You can also set a watch on a key, so that if the config value changes you are notified.
+
+* OS: Event
+
+Event is a microservice for storing events and aggregating them.
+
+	https://github.com/micro/event-srv
+
+Event allows you to publish events, and subscribe to event topics.  Events may have arbitrary metadata, stored as key/value pairs.
+
+* OS: K/V
+
+KV service is a microservice that serves as a key-value store using gossip. It leverages go-os/kv and participates in a consistent hash ring by broadcasting its availability as a server.
+
+	https://github.com/micro/kv-srv
+
+With a consistent hash ring implementation, k/v is both fast and highly available, so it's a good way to store frequently retrieved k/v data without installing a custom database.
+
+* OS: Monitor
+
+Monitoring server is a microservice which monitors all the applications within the environment. It's a passive system used for observation and actions are taken separately based on monitoring events.
+
+	https://github.com/micro/monitor-srv
+
+Example of a service using Monitor:
+
+	https://github.com/micro/go-os/blob/master/examples/monitor/monitor.go
+
+* OS: Router
+
+Router server provides global routing capabilities. It is not a proxy. It has the go-micro.Selector semantics and offloads actual routing to smart clients. Its job is to maintain routing information about the environment and route appropriately.
+
+	https://github.com/micro/router-srv
+
+Use the Router to provide smart load balancing in a multi- datacenter deployment.
+
+* OS: Trace
+
+Trace server is a distributed tracing storage system. 
+
+	https://github.com/micro/trace-srv
+
+The Trace server allows you to query and view traces of individual requests through the various microservice calls that may occur in servicing that request.
+
+Traces are sent by publishing to the broker topic `micro.trace.span`
+
+* Recommendations for Production Usage
+
+For a production deplyment of microservices, I recommend the following patterns.
+
+* Events
+
+Generate an Event for every action in your system that is constructive/destructive.  Every action that creates or modifies data should generate an event.
+
+Example:
+
+	Account.Login -> Generate an event
+	Account.Logout -> Generate an event
+	User.Create -> Generate an event 
+	User.Modify -> Generate an event 
+
+* Events
+
+Use events to trigger out-of-band actions.  Subscribe to event `types`, and use the data and metadata in the event to process your action.
+
+Example:
+
+	User.Create -> Send welcome email
+	User.Modify -> Store audit log of change
+
+* Monitor
+
+Use `monitor` to go beyond simple service aliveness checking and implement deep service and dependency checking.
+
+Register health checks for your microservices that check on the availability of the microservices' dependencies like databases, external services, caches, etc.
+
+Example:
+	https://github.com/micro/go-os/blob/master/examples/monitor/monitor.go
+
+
+* Config
+
+Use `config` to store globally useful configuration information.  Determine which config values are important enough to create watches, and watch those keys so that you can dynamically adjust to changes.
+
+Example:
+
+Store a global "loglevel" in the `config` service, then watch that key.  Adjust local logging based on the global log level, with a watch.  Now you can dynamically adjust the log level of your entire infrastructure with one key change in the config store.
+
+* Metrics
+
+Use `metrics` to send key indicators of your application's performance to Telegraph.  Telegraph (from influxdb) can be configured to output these metrics to any number of metrics reporting tools:
+	
+	https://github.com/influxdata/telegraf#output-plugins
+
+Using `metrics` means you don't have to change your code when you want to upgrade your metrics collection and reporting stores.
+
+* Exercise
+
+Start an `event` server:
+
+	https://github.com/micro/event-srv
+
+Reimplement the service in Module 4 to emit events on methods that change data.
+
+See documentation: https://godoc.org/github.com/micro/go-os/event
+
+Pro-Tip:  Create constant event types in your service:
+
+	const NewAccountEvent = "NewAccount"
