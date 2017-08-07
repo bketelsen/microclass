@@ -12,6 +12,7 @@ In this module we will demonstrate the Micro platform and show students the tool
 
 In order to run any micro services we need a registry.  The default registry is `consul`, which you can install from consul.io, or run using docker.
 
+    go get github.com/hashicorp/consul
     consul agent -dev
 
 We'll start consul in a new terminal window in `dev` mode, so it won't expect other nodes to join.
@@ -161,6 +162,8 @@ new -- create a new microservice from a template
     Install consul from consul.io Install micro :
         go get github.com/micro/micro
     Start Consul
+    Install protoc compiler:
+        https://github.com/google/protobuf/releases
     Generate a new service with `micro new`
     Install the protobuf compilers for micro using the output from `micro new` as your guide
     Compile the proto file using the output from `micro new` as your guide

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
 	user "github.com/bketelsen/microclass/module4/userservice/proto/account"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -114,9 +114,11 @@ func DeleteSession(id string) error {
 
 func ReadSession(id string) (*user.Session, error) {
 	sess := &user.Session{}
-
+	fmt.Println("read session query:", st["readSession"])
+	fmt.Println("Querying for ID:", id)
 	r := st["readSession"].QueryRow(id)
 	if err := r.Scan(&sess.Id, &sess.Username, &sess.Created, &sess.Expires); err != nil {
+		fmt.Println("Error received:", err)
 		if err == sql.ErrNoRows {
 			return nil, errors.New("not found")
 		}

@@ -100,3 +100,10 @@ Combine both to enable logical and physical groupings.
 *goa*: design based approach
 
 - codegen, design sharing helps building "conforming" services
+
+* Code Walk Through
+
+- gizmo
+- gokit
+- goa
+- micro

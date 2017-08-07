@@ -3,11 +3,12 @@ package handler
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"strings"
 	"time"
 
-	"github.com/micro/go-micro/errors"
 	"github.com/bketelsen/microclass/module4/userservice/db"
+	"github.com/micro/go-micro/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
 
@@ -147,11 +148,12 @@ func (s *Account) Logout(ctx context.Context, req *account.LogoutRequest, rsp *a
 }
 
 func (s *Account) ReadSession(ctx context.Context, req *account.ReadSessionRequest, rsp *account.ReadSessionResponse) error {
+	fmt.Println("SessionID:", req.SessionId)
 	sess, err := db.ReadSession(req.SessionId)
 	if err != nil {
+		fmt.Println("Got error from db:", err)
 		return err
 	}
 	rsp.Session = sess
 	return nil
 }
-
