@@ -12,7 +12,8 @@ In this module we will demonstrate the Micro platform and show students the tool
 
 In order to run any micro services we need a registry.  The default registry is `consul`, which you can install from consul.io, or run using docker.
 
-    go get github.com/hashicorp/consul
+    brew install consul -- or --
+    https://consul.io/downloads.html
     consul agent -dev
 
 We'll start consul in a new terminal window in `dev` mode, so it won't expect other nodes to join.
