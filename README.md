@@ -12,3 +12,5 @@ This course includes 7 modules.  Each module has a slide or series of slides and
 
 There are bash scripts to start docker containers for dependent services (like databases) where necessary.
 
+
+TODO: Make standalone gopath so older/conflicting project checkouts don't cause problems
