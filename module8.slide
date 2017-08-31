@@ -1,9 +1,19 @@
-Using Micro Plugins
+Micro in production
 
 Brian Ketelsen
 me@brianketelsen.com
 @bketelsen
 
-* Using Micro Plugins
+* Micro in Production
 
-In this module we will demonstrate how to replace the decisions that are defaulted in Micro with plugins to represent your business needs.
+* Micro OS
+
+* Plugins
+
+* Tracing
+
+* Metrics
+
+* Deployment
+
+* Kubernetes

@@ -93,7 +93,7 @@ Micro provides some wrappers which are similar in functionality to middleware.
 
 * ProTip
 
-Plugins are registered with import statements.  Add an extra file to your package, and guard it with build tags.
+Plugins are registered with import statements.  Add an extra file to your package, and guard it with build tags if you don't want to use the same plugins in development and production.
 
 production.go:
     //+build production

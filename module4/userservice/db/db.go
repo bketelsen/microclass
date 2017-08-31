@@ -148,7 +148,7 @@ func Update(user *user.User) error {
 
 func Read(id string) (*user.User, error) {
 	user := &user.User{}
-
+	fmt.Println("searching for ", id)
 	r := st["read"].QueryRow(id)
 	var s, p string
 	if err := r.Scan(&user.Id, &user.Username, &user.Email, &s, &p, &user.Created, &user.Updated); err != nil {

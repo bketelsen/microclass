@@ -34,7 +34,6 @@ func random(i int) string {
 		}
 		return string(bytes)
 	}
-	return "ughwhy?!!!"
 }
 
 const (

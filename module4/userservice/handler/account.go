@@ -32,7 +32,6 @@ func random(i int) string {
 		}
 		return string(bytes)
 	}
-	return "ughwhy?!!!"
 }
 
 type Account struct{}
@@ -80,16 +79,19 @@ func (s *Account) Search(ctx context.Context, req *account.SearchRequest, rsp *a
 
 func (s *Account) UpdatePassword(ctx context.Context, req *account.UpdatePasswordRequest, rsp *account.UpdatePasswordResponse) error {
 	usr, err := db.Read(req.UserId)
+	fmt.Println("after read", usr, err, req.UserId)
 	if err != nil {
 		return errors.InternalServerError("go.micro.srv.user.updatepassword", err.Error())
 	}
 
 	salt, hashed, err := db.SaltAndPassword(usr.Username, usr.Email)
+	fmt.Println("after salt, hash", salt, hashed, err)
 	if err != nil {
 		return errors.InternalServerError("go.micro.srv.user.updatepassword", err.Error())
 	}
 
 	hh, err := base64.StdEncoding.DecodeString(hashed)
+	fmt.Println("after decode string", hh, err)
 	if err != nil {
 		return errors.InternalServerError("go.micro.srv.user.updatepassword", err.Error())
 	}
@@ -100,12 +102,14 @@ func (s *Account) UpdatePassword(ctx context.Context, req *account.UpdatePasswor
 
 	salt = random(16)
 	h, err := bcrypt.GenerateFromPassword([]byte(x+salt+req.NewPassword), 10)
+	fmt.Println("after new password", h)
 	if err != nil {
 		return errors.InternalServerError("go.micro.srv.user.updatepassword", err.Error())
 	}
 	pp := base64.StdEncoding.EncodeToString(h)
 
 	if err := db.UpdatePassword(req.UserId, salt, pp); err != nil {
+		fmt.Println("after update", err)
 		return errors.InternalServerError("go.micro.srv.user.updatepassword", err.Error())
 	}
 	return nil
